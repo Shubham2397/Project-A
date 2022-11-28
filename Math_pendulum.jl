@@ -14,6 +14,7 @@ mutable struct Math_pendulum
 	g::Float64
     m::Float64
 	c::Float64 #added by Aaron
+	# k::Float64 #added by Shubham
 	phi::Float64
 	phi_dot::Float64
     Math_pendulum(l, g, m, c, phi, phi_dot) = new(l, g, m, c, phi, phi_dot)

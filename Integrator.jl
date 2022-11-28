@@ -35,9 +35,9 @@ function run_euler_step(int::Main.Dynsys.Integrator, pendulum)
     ###### (homework) ######
     # without damping constant c at the moment
     phi_dot_dot = - pendulum.g / pendulum.l * pendulum.phi
-    println(phi_dot_dot)
+    println("phi_dot_dot: ", phi_dot_dot)
     phi_dot_plus = pendulum.phi_dot + int.delta_t * phi_dot_dot
-    println(phi_dot_plus)
+    println("phi_dot_plus: ",phi_dot_plus)
     phi_plus = pendulum.phi + int.delta_t * pendulum.phi_dot
     pendulum.phi = phi_plus
     pendulum.phi_dot = phi_dot_plus
@@ -50,10 +50,20 @@ end
 function run_central_diff_step(int::Main.Dynsys.Integrator, pendulum)
     println("Running central difference step")
     ###### (homework) ######
-    phi_dot_dot = - pendulum.g / pendulum.l * pendulum.phi - pendulum.phi_dot * pendulum.c
-    phi_i_plus = pendulum.phi + pendulum.phi_dot * int.delta_t + phi_dot_dot * int.delta_t^2 / 2
-    phi_i_minus = pendulum.phi - pendulum.phi_dot * int.delta_t + phi_dot_dot * int.delta_t^2 / 2
-    phi_dot_plus = (phi_i_plus - phi_i_minus)/(2 * int.delta_t)
+    # phi_dot_dot = - pendulum.g / pendulum.l * pendulum.phi - pendulum.phi_dot * pendulum.c
+    # phi_i_plus = pendulum.phi + pendulum.phi_dot * int.delta_t + phi_dot_dot * int.delta_t^2 / 2
+    # phi_i_minus = pendulum.phi - pendulum.phi_dot * int.delta_t + phi_dot_dot * int.delta_t^2 / 2
+    # phi_dot_plus = (phi_i_plus - phi_i_minus)/(2 * int.delta_t)
+    # pendulum.phi = phi_i_plus
+    # pendulum.phi_dot = phi_dot_plus
+    phi_dot_dot = ((pendulum.m*pendulum.g) - (pendulum.c*pendulum.phi_dot)-(0*pendulum.phi)/pendulum.m)
+    phi_i_minus = pendulum.phi - (int.delta_t*pendulum.phi_dot) + ((int.delta_t^2)*phi_dot_dot/2)
+    K_hat = (pendulum.m/(int.delta_t^2))+(pendulum.c/(2*int.delta_t))
+    P_hat = (pendulum.m*pendulum.g) - ((pendulum.m/(int.delta_t^2))+(pendulum.c/(2*int.delta_t))*phi_i_minus) - ((0 - (2*pendulum.m/(int.delta_t^2)))*pendulum.phi)
+    phi_i_plus = P_hat/K_hat
+    P_hat_plus = (pendulum.m*pendulum.g) - ((pendulum.m/(int.delta_t^2))+(pendulum.c/(2*int.delta_t))*pendulum.phi) - ((0 - (2*pendulum.m/(int.delta_t^2)))*phi_i_minus)
+    phi_i_plus_plus = P_hat_plus/K_hat  
+    phi_dot_plus = (phi_i_plus_plus - phi_i_plus)/(2*int.delta_t)
     pendulum.phi = phi_i_plus
     pendulum.phi_dot = phi_dot_plus
     return pendulum
