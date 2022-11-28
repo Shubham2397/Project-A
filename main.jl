@@ -22,12 +22,12 @@ println("-- pendulum euler --")
 
 ## load pendulum
 include("Dynsys.jl")
-pendulum = Dynsys.Math_pendulum(1.0, 10.0, 1.0, 500, 1, 0.0)
+pendulum = Dynsys.Math_pendulum(1.0, 10.0, 1.0, 5.0, 1, 0.0)
 include("Integrator.jl") # added by Aaron
 println(typeof(pendulum))
 ## load integrator and memory for the results
 
-Integ = Dynsys.Integrator(1.0e-3,1000)
+Integ = Dynsys.Integrator(2.0e-3,1000)
 Integ.res_phi = zeros(Integ.timesteps)
 Integ.res_phi_dot = zeros(Integ.timesteps)
 time = zeros(Integ.timesteps)
@@ -47,19 +47,24 @@ for i in 1:Integ.timesteps
     println(typeof(pendulum))
     # plot the state
     fig = Dynsys.create_fig(pendulum) # Why does this not work? How to call pendulum?
-    Dynsys.run_step(Integ, "euler", pendulum)
+    Dynsys.run_step(Integ, "central_diff", pendulum)
     Dynsys.plot_state(pendulum)
     display(fig)
     # save the step
     Integ.res_phi[i] = pendulum.phi
     Integ.res_phi_dot[i] = pendulum.phi_dot
 end
-println(time)
-display(plot(time,Integ.res_phi))
+#println("time",time)
+println("Res_phi: ",Integ.res_phi)
+println("Res_phi_dot: ",Integ.res_phi_dot)
+
+
+display(plot(time,[Integ.res_phi,Integ.res_phi_dot]))
+#display(plot(time,Integ.res_phi))
 #show(plot(time,Integ.res_phi))
-readline()
-display(plot(time,Integ.res_phi_dot))
-readline()
+# readline()
+#display(plot(time,Integ.res_phi_dot))
+# readline()
 ######## Homework
 # implement the euler integration step
 # implement the central difference integration step
